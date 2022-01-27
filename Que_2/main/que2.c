@@ -7,7 +7,11 @@
 TaskHandle_t xTask1;
 TaskHandle_t xTask2;
 
-TimerHandle_t xTask3;
+TimerHandle_t xTimer;
+void timerfunction(TimerHandle_t xTimer)
+{
+    printf("timer callback function\n");
+}
 
 void task_1(void *pv)
 {
@@ -27,15 +31,17 @@ void task_2(void *pv)
     }
 }
 
-void task_3(TimerHandle_t xTimer)
+void task_3(void *pv)
 {
     count++;
     printf("Task 3 \n");
+    vTaskDelay(pdMS_TO_TICKS(5000));
 
-    if(count==5)
+    if(count==2)
     {
-        printf("Turning off the timer\n");
-        xTimerStop(xTimer,0);
+        
+        xTimerStart(Task3,0);
+
     }
     
 }
@@ -58,12 +64,13 @@ void app_main()
         printf("task_2 created\n");
     }
 
-    Task3 = xTimerCreate("TimerOFF",pdMS_TO_TICKS(10000),pdFALSE,NULL,task_3);
-    xTimerStart(Task3,0);
+    result=xTaskCreate(task_3,"task_3",2048,NULL,7,&xTask3);
 
-    while(1)
+    if(result==pdPASS)
     {
-        printf("Main task\n");
-        vTaskDelay(pdMS_TO_TICKS(10000));
+        printf("task_3 created\n");
     }
+    Timer = xTimerCreate("TimerOFF",pdMS_TO_TICKS(10),pdFALSE,NULL,Taskfunction);
+    
+    
 }
